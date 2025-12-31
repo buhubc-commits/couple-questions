@@ -1,57 +1,100 @@
 <!DOCTYPE html>
 <html lang="mn">
 <head>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#e75480">
   <meta charset="UTF-8">
-  <title>Хосуудын асуулт</title>
+  <title>Truth or Dare – Хосууд</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #fff6f8;
+      background: #0f0f1a;
+      color: white;
       text-align: center;
-      padding: 40px 20px;
+      padding: 30px 20px;
     }
-    h1 {
-      color: #e75480;
-    }
-    #question {
-      font-size: 22px;
-      margin: 40px 0;
-      min-height: 80px;
+    h1 { color: #ff4d6d; }
+    #card {
+      background: #1c1c2e;
+      padding: 30px;
+      border-radius: 15px;
+      min-height: 120px;
+      font-size: 20px;
+      margin: 30px 0;
     }
     button {
-      background: #e75480;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      font-size: 18px;
+      margin: 8px;
+      padding: 12px 20px;
+      font-size: 16px;
       border-radius: 10px;
+      border: none;
     }
+    .truth { background: #4dabf7; }
+    .dare { background: #ff6b6b; }
+    .nav { background: #343a40; color: white; }
+    .heart { background: #ff4d6d; }
   </style>
 </head>
 <body>
 
-  <h1>❤️ Хосуудын асуулт</h1>
-  <div id="question">Товч дарж асуулт авна уу</div>
-  <button onclick="newQuestion()">🎲 Асуулт авах</button>
+<h1>🔥 Truth or Dare</h1>
+<p>Хосуудын дотно тоглоом</p>
 
-  <script>
-    const questions = [
-      "Анх намайг хараад юу мэдэрсэн бэ?",
-      "Сүүлийн 3 жилд бид хоёр яаж өөрчлөгдсөн бэ?",
-      "Хүүхэдтэй болсноор амьдрал чинь яаж өөрчлөгдсөн бэ?",
-      "Намайг хэзээ хамгийн их хайрлаж байгааг мэдэрдэг вэ?",
-      "Одоо надад хэлмээр байгаа зүйл юу вэ?"
-    ];
+<div id="card">Товч дарж эхлүүлнэ үү</div>
 
-    function newQuestion() {
-      const random = Math.floor(Math.random() * questions.length);
-      document.getElementById("question").innerText = questions[random];
-    }
-  </script>
+<button class="truth" onclick="newTruth()">Truth</button>
+<button class="dare" onclick="newDare()">Dare</button><br>
+<button class="nav" onclick="prev()">⬅️ Буцах</button>
+<button class="nav" onclick="next()">➡️ Дараагийнх</button>
+<button class="heart" onclick="like()">❤️</button>
+
+<script>
+const truthQuestions = [
+  "Шинэ жилийн энэ мөчид надад хамгийн их талархаж буй зүйл?",
+  "Намайг хэзээ хамгийн их хүсэж байснаа нууж байсан бэ?",
+  "Чиний дотор хэнд ч хэлж байгаагүй бодол?",
+  "INTP хүний хувьд надтай байхад чиний хамгийн их яддаг, бас хайрладаг зүйл?",
+  "Хилэнцийн орд шиг хамгийн их атаархаж байсан мөч?"
+];
+
+const dareChallenges = [
+  "Намайг 30 секунд тэвэр",
+  "Чихэнд минь яг одоо хэлмээр байгаа үгээ шивнэ",
+  "Гараас минь бариад 1 минут юу ч ярихгүй суу",
+  "Намайг яагаад хүсдэгээ нүд рүү минь хараад хэл",
+  "+21: Надад яг одоо юу хийхийг хүсэж байгаагаа шивнэ"
+];
+
+let history = [];
+let index = -1;
+
+function show(text) {
+  document.getElementById("card").innerText = text;
+}
+
+function newTruth() {
+  const q = truthQuestions[Math.floor(Math.random()*truthQuestions.length)];
+  history.push(q); index++;
+  show("💬 " + q);
+}
+
+function newDare() {
+  const d = dareChallenges[Math.floor(Math.random()*dareChallenges.length)];
+  history.push(d); index++;
+  show("🔥 " + d);
+}
+
+function prev() {
+  if (index > 0) { index--; show(history[index]); }
+}
+
+function next() {
+  if (index < history.length-1) { index++; show(history[index]); }
+}
+
+function like() {
+  alert("❤️ Таалагдлаа! (дараагийн шатанд хадгалдаг болгоно)");
+}
+</script>
 
 </body>
 </html>
-

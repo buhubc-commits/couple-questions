@@ -1,98 +1,137 @@
 <!DOCTYPE html>
 <html lang="mn">
 <head>
-  <meta charset="UTF-8">
-  <title>Truth or Dare – Хосууд</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f0f1a;
-      color: white;
-      text-align: center;
-      padding: 30px 20px;
-    }
-    h1 { color: #ff4d6d; }
-    #card {
-      background: #1c1c2e;
-      padding: 30px;
-      border-radius: 15px;
-      min-height: 120px;
-      font-size: 20px;
-      margin: 30px 0;
-    }
-    button {
-      margin: 8px;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: none;
-    }
-    .truth { background: #4dabf7; }
-    .dare { background: #ff6b6b; }
-    .nav { background: #343a40; color: white; }
-    .heart { background: #ff4d6d; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truth or Dare – Хосууд</title>
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #fff6f8;
+  text-align: center;
+  padding: 30px 15px;
+}
+h1 { color: #e75480; }
+button {
+  padding: 14px 22px;
+  margin: 8px;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  background: #e75480;
+  color: white;
+}
+.lang {
+  background: #999;
+}
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  margin-top: 20px;
+  font-size: 20px;
+  min-height: 120px;
+}
+.heart {
+  font-size: 26px;
+  cursor: pointer;
+}
+</style>
 </head>
+
 <body>
 
 <h1>🔥 Truth or Dare</h1>
-<p>Хосуудын дотно тоглоом</p>
 
-<div id="card">Товч дарж эхлүүлнэ үү</div>
+<button onclick="setMode('truth')">🎤 Truth</button>
+<button onclick="setMode('dare')">🔥 Dare</button>
+<br>
+<button class="lang" onclick="toggleLang()">🌐 MN / KR</button>
 
-<button class="truth" onclick="newTruth()">Truth</button>
-<button class="dare" onclick="newDare()">Dare</button><br>
-<button class="nav" onclick="prev()">⬅️ Буцах</button>
-<button class="nav" onclick="next()">➡️ Дараагийнх</button>
-<button class="heart" onclick="like()">❤️</button>
+<div class="card" id="card">Тоглоомоо сонгоно уу</div>
+<div class="heart" onclick="toggleLike()">🤍</div>
 
 <script>
-const truthQuestions = [
-  "Шинэ жилийн энэ мөчид надад хамгийн их талархаж буй зүйл?",
-  "Намайг хэзээ хамгийн их хүсэж байснаа нууж байсан бэ?",
-  "Чиний дотор хэнд ч хэлж байгаагүй бодол?",
-  "INTP хүний хувьд надтай байхад чиний хамгийн их яддаг, бас хайрладаг зүйл?",
-  "Хилэнцийн орд шиг хамгийн их атаархаж байсан мөч?"
-];
+let mode = "";
+let lang = "mn";
+let current = null;
 
-const dareChallenges = [
-  "Намайг 30 секунд тэвэр",
-  "Чихэнд минь яг одоо хэлмээр байгаа үгээ шивнэ",
-  "Гараас минь бариад 1 минут юу ч ярихгүй суу",
-  "Намайг яагаад хүсдэгээ нүд рүү минь хараад хэл",
-  "+21: Надад яг одоо юу хийхийг хүсэж байгаагаа шивнэ"
-];
+const data = {
+truth: [
+{mn:"Надад одоо ч хэлж зүрхлээгүй үнэн бий юу?", kr:"아직 나에게 말하지 못한 진실이 있어?"},
+{mn:"Чи надтай анх унтахдаа юу бодож байсан бэ?", kr:"나와 처음 잘 때 무슨 생각했어?"},
+{mn:"Миний аль зан чамайг хамгийн их татдаг вэ?", kr:"내 어떤 점이 가장 끌려?"},
+{mn:"Намайг өөр хүнтэй хардаж байсан уу?", kr:"나를 다른 사람으로 질투한 적 있어?"},
+{mn:"Хэн түрүүлж илүү их дурласан гэж боддог вэ?", kr:"누가 먼저 더 사랑에 빠졌다고 생각해?"},
+{mn:"Одоог хүртэлх хамгийн халуухан дурсамж?", kr:"지금까지 가장 야했던 기억은?"},
+{mn:"Чи намайг хүсдэг үе чинь хэзээ вэ?", kr:"나를 가장 원할 때는 언제야?"},
+{mn:"Би чиний фантазид орж байсан уу?", kr:"내가 네 판타지에 나온 적 있어?"},
+{mn:"Хэзээ намайг алдах вий гэж айж байсан бэ?", kr:"언제 나를 잃을까 봐 무서웠어?"},
+{mn:"Чиний бодлоор бидний секс амьдралд дутагдаж буй зүйл?", kr:"우리의 성생활에 부족한 점은 뭐야?"},
 
-let history = [];
-let index = -1;
+{mn:"Надтай хамгийн удаан тэврэлдэж байсан үе?", kr:"나와 가장 오래 안았던 순간은?"},
+{mn:"Надад гомдож явдаг нууц зүйл бий юу?", kr:"나에게 서운했던 걸 아직도 숨기고 있어?"},
+{mn:"Би чиний ideal type-д тохирдог уу?", kr:"내가 네 이상형에 맞아?"},
+{mn:"Намайг өөр хүнтэй төсөөлж үзсэн үү?", kr:"나를 다른 사람과 상상해본 적 있어?"},
+{mn:"Одоо яг надтай юу хиймээр байна?", kr:"지금 당장 나와 뭐 하고 싶어?"}
+],
 
-function show(text) {
-  document.getElementById("card").innerText = text;
+dare: [
+{mn:"Намайг 30 секунд чанга тэвэр", kr:"30초 동안 나를 꼭 안아줘"},
+{mn:"Чихэнд минь шивнээд нэг нууц хэл", kr:"내 귀에 비밀 하나 속삭여"},
+{mn:"Миний гарнаас бариад 1 минут чимээгүй суу", kr:"내 손 잡고 1분간 조용히 있어"},
+{mn:"Намайг үнсэх хамгийн дуртай газраа үнс", kr:"내가 좋아하는 곳에 키스해"},
+{mn:"Хамгийн секси хоолойгоор нэрийг минь хэл", kr:"가장 섹시한 목소리로 내 이름 불러"},
+{mn:"Надад 3 комплимент хэл", kr:"나에게 칭찬 3개 말해"},
+{mn:"Намайг хаана үнсэхээ өөрөө сонго", kr:"어디에 키스할지 네가 정해"},
+{mn:"Над руу 10 секунд ширт", kr:"10초 동안 나를 바라봐"},
+{mn:"Хүзүүн дээр минь зөөлөн үнс", kr:"내 목에 부드럽게 키스해"},
+{mn:"Надад маргааш юу хийхээ амла", kr:"내일 나를 위해 뭐 할지 약속해"},
+
+{mn:"Намайг тэвэрч унтмаар байгаагаа хэл", kr:"나를 안고 자고 싶다고 말해"},
+{mn:"Одоо надтай үнэн сэтгэлээсээ нэг зүйл хуваалц", kr:"지금 진심 하나 말해줘"},
+{mn:"Надад 1 fantasy хэл", kr:"판타지 하나 말해줘"},
+{mn:"Намайг хамгийн дур булаам гэж боддог хувцсыг хэл", kr:"내가 가장 매력적으로 보이는 옷 말해"},
+{mn:"Одоо надтай гараа холбож суу", kr:"지금 내 손 잡아"}
+]
+};
+
+function setMode(m){
+  mode = m;
+  next();
 }
 
-function newTruth() {
-  const q = truthQuestions[Math.floor(Math.random()*truthQuestions.length)];
-  history.push(q); index++;
-  show("💬 " + q);
+function next(){
+  const arr = data[mode];
+  current = arr[Math.floor(Math.random()*arr.length)];
+  document.getElementById("card").innerText = current[lang];
+  document.querySelector(".heart").innerText = isLiked() ? "❤️" : "🤍";
 }
 
-function newDare() {
-  const d = dareChallenges[Math.floor(Math.random()*dareChallenges.length)];
-  history.push(d); index++;
-  show("🔥 " + d);
+function toggleLang(){
+  lang = lang === "mn" ? "kr" : "mn";
+  if(current) document.getElementById("card").innerText = current[lang];
 }
 
-function prev() {
-  if (index > 0) { index--; show(history[index]); }
+function toggleLike(){
+  if(!current) return;
+  let likes = JSON.parse(localStorage.getItem("likes") || "[]");
+  const text = current.mn;
+  if(likes.includes(text)){
+    likes = likes.filter(i=>i!==text);
+  } else {
+    likes.push(text);
+  }
+  localStorage.setItem("likes", JSON.stringify(likes));
+  document.querySelector(".heart").innerText = isLiked() ? "❤️" : "🤍";
 }
 
-function next() {
-  if (index < history.length-1) { index++; show(history[index]); }
-}
-
-function like() {
-  alert("❤️ Таалагдлаа! (дараагийн шатанд хадгалдаг болгоно)");
+function isLiked(){
+  let likes = JSON.parse(localStorage.getItem("likes") || "[]");
+  return current && likes.includes(current.mn);
 }
 </script>
 
